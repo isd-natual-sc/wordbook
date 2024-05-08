@@ -5,7 +5,7 @@ import { auth } from "@/firebase/firebase";
 import UserInfo from "./UserInfo";
 
 const Auth = () => {
-  const user = useAuthState(auth);
+  const [user] = useAuthState(auth);
   return (
     <div>
       {user ? (

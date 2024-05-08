@@ -2,14 +2,20 @@
 import { auth } from "@/firebase/firebase";
 import { signOut } from "firebase/auth";
 
-const page = () => {
+const SignOut = () => {
   return (
     <div>
-      <button onClick={() => signOut(auth).then(() => alert("Success D:"))}>
+      <button
+        onClick={() =>
+          signOut(auth)
+            .then(() => alert("Success D:"))
+            .catch((err) => console.error(err))
+        }
+      >
         サインアウトする
       </button>
     </div>
   );
 };
 
-export default page;
+export default SignOut;

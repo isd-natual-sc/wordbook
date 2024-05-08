@@ -1,16 +1,20 @@
+import { DocumentData } from "firebase/firestore";
+
 type LoginForm = {
   mail: string;
   pw: string;
 };
 
 type Data = {
+  do_remind: boolean;
+  user_id: string;
   word: string;
   mean: string;
 };
 
 type Pair = {
   id: string;
-  data: Data;
+  data: DocumentData;
 };
 
-export type { LoginForm, Pair };
+export type { LoginForm, Pair, Data };

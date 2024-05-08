@@ -2,20 +2,13 @@
 
 import { auth } from "@/firebase/firebase";
 import { LoginForm } from "@/types";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useRef } from "react";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
 
 const MailSignIn = () => {
-  const mailRef = useRef<HTMLInputElement>(null);
-  const pwRef = useRef<HTMLInputElement>(null);
-
-  const rule = z.object({
-    mail: z.string().email(),
-    pw: z.string().min(10),
-  });
-
   const {
     register,
     handleSubmit,
@@ -28,33 +21,53 @@ const MailSignIn = () => {
     },
   });
 
-  const signIn: SubmitHandler<LoginForm> = (data) => {
-    signInWithEmailAndPassword(auth, data.mail, data.pw).then(() =>
-      alert("Success :D")
+  const signIn: SubmitHandler<LoginForm> = async (data) => {
+    await signInWithEmailAndPassword(auth, data.mail, data.pw).then(() =>
+      alert("Success :D!")
     );
+  };
+  const createUser: SubmitHandler<LoginForm> = async (data) => {
+    try {
+      await createUserWithEmailAndPassword(auth, data.mail, data.pw).then(() =>
+        alert("Success :D")
+      );
+    } catch (err1) {
+      try {
+        signIn(data);
+      } catch (err2) {
+        console.error(err1 + " & " + err2);
+      }
+    }
   };
   return (
     <form
       className="m-5 flex flex-col justify-center items-center"
-      onSubmit={handleSubmit((data) => signIn(data))}
+      onSubmit={handleSubmit((data) => createUser(data))}
     >
       <div className="p-2 m-5">
         <label className="m-2">メールアドレス</label>
         <input
           type="email"
-          {...register("mail", { required: true })}
-          className=" text-2xl border-teal-500 border"
+          {...register("mail", { required: "メールアドレスは必須です。" })}
+          className=" text-2xl border-teal-500 border rounded-xl"
         />
+        <div className="text-red-900">{errors.mail?.message}</div>
       </div>
       <div className="p-2 m-5">
         <label className="m-2">パスワード</label>
         <input
           type="password"
-          {...register("pw", { required: true, minLength: 10 })}
-          className="text-2xl border-red-500 border"
+          {...register("pw", {
+            required: "パスワードは必須です。",
+            minLength: {
+              value: 10,
+              message: "パスワードは10文字以上で設定してください",
+            },
+          })}
+          className="text-2xl border-red-500 border rounded-xl"
         />
+        <div className="text-red-900">{errors.pw?.message}</div>
       </div>
-      {errors.pw?.message && <h2>Okay</h2>}
       <button type="submit" className="p-2 m-5 bg-amber-100 shadow">
         このメールアドレスでサインイン
       </button>
