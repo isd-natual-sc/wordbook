@@ -3,17 +3,27 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import Link from "next/link";
 import { auth } from "@/firebase/firebase";
 import ServerUserInfo from "./ServerUserInfo";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
 // import UserInfo from "./UserInfo";
 
 const Auth = () => {
   const [user] = useAuthState(auth);
+  const router = useRouter();
   return (
     <div>
       {user ? (
         <div>
-          <Link href={"/auth/signout"} className="text-xl p-2 m-2">
+          <button
+            onClick={() =>
+              signOut(auth)
+                .then(() => alert("Success D:"))
+                .then(() => router.push("/"))
+                .catch((err) => console.error(err))
+            }
+          >
             サインアウトする
-          </Link>
+          </button>
           {/* <UserInfo /> */}
           <ServerUserInfo />
         </div>

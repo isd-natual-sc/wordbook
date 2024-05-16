@@ -12,7 +12,7 @@ export const addWordAction = async (
   const word = String(fd.get("word"));
   const mean = String(fd.get("mean"));
 
-  if (!(word && mean)) throw new Error("なんか入力しろ");
+  if (!(word || mean)) throw new Error("なんか入力しろ");
   if (!userID) throw new Error();
   const addData: Data = {
     do_remind: false,
