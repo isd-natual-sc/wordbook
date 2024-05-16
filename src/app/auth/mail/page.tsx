@@ -1,18 +1,17 @@
 "use client";
-
 import { auth } from "@/firebase/firebase";
 import { LoginForm } from "@/types";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const MailSignIn = () => {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<LoginForm>({
     defaultValues: {
@@ -21,6 +20,8 @@ const MailSignIn = () => {
     },
   });
 
+  const router = useRouter();
+
   const signIn: SubmitHandler<LoginForm> = async (data) => {
     await signInWithEmailAndPassword(auth, data.mail, data.pw).then(() =>
       alert("Success :D!")
@@ -28,9 +29,9 @@ const MailSignIn = () => {
   };
   const createUser: SubmitHandler<LoginForm> = async (data) => {
     try {
-      await createUserWithEmailAndPassword(auth, data.mail, data.pw).then(() =>
-        alert("Success :D")
-      );
+      await createUserWithEmailAndPassword(auth, data.mail, data.pw)
+        .then(() => alert("Success :D"))
+        .then(() => router.push("/"));
     } catch (err1) {
       try {
         signIn(data);
