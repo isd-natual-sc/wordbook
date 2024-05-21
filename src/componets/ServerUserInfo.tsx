@@ -3,7 +3,8 @@
 import { addWordAction, getWordAction } from "@/Actions/wordAction";
 import { auth } from "@/firebase/firebase";
 import { Pair } from "@/types";
-import { useCallback, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+// import WordList from "./WordList";
 
 const ServerUserInfo = () => {
   const [pairs, setPairs] = useState<Pair[]>([]);
@@ -17,23 +18,21 @@ const ServerUserInfo = () => {
     setPairs(res);
   };
 
-  useCallback(
-    () =>
-      getWord().then(() => {
-        wordRef.current!.value = "";
-        meanRef.current!.value = "";
-      }),
-    [flag]
-  );
+  useEffect(() => {
+    getWord().then(() => {
+      wordRef.current!.value = "";
+      meanRef.current!.value = "";
+    });
+  }, [flag]);
 
   return (
     <div>
       <form
-        action={(fd) => addWordAction(fd, auth.currentUser?.uid)}
-        onSubmit={(e) => {
-          e.preventDefault();
-          setFlag(flag + 1);
-        }}
+        action={(fd) =>
+          addWordAction(fd, auth.currentUser!.uid).then(() => {
+            setFlag(flag + 1);
+          })
+        }
         className="flex flex-col items-center w-full"
       >
         <div>
@@ -59,21 +58,23 @@ const ServerUserInfo = () => {
           単語の登録
         </button>
       </form>
-
-      <ul>
-        {pairs.map((pair) =>
-          pair.data.user_id === auth.currentUser?.uid ? (
-            <li key={pair.id}>
-              <input type="checkbox" checked={pair.data.do_remind} />
-              <div className="flex items-center">
-                <h2>{pair.data.word}</h2>
-                <h2>{pair.data.mean}</h2>
-              </div>
-            </li>
-          ) : (
-            <div key={"None"}>None</div>
-          )
-        )}
+      <ul className="py-5 my-5">
+        {pairs.map((pair) => {
+          if (pair.data.user_id === auth.currentUser?.uid) {
+            return (
+              <li
+                key={pair.id}
+                className="flex justify-center items-center my-5"
+              >
+                <input type="checkbox" checked={pair.data.do_remind} readOnly />
+                <div className="flex flex-col items-center">
+                  <h2>{pair.data.word}</h2>
+                  <h2>{pair.data.mean}</h2>
+                </div>
+              </li>
+            );
+          }
+        })}
       </ul>
     </div>
   );
